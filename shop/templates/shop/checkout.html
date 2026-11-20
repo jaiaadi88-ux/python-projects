@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout - My Online Store</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #222;
+        }
+
+        .checkout-container {
+            display: flex;
+            gap: 30px;
+            max-width: 1100px;
+            margin: 30px auto;
+            align-items: flex-start;
+        }
+
+        .customer-details,
+        .order-summary {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .customer-details {
+            flex: 2;
+        }
+
+        .order-summary {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 7px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .place-order {
+            width: 100%;
+            background: #28a745;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 17px;
+            cursor: pointer;
+        }
+
+        .place-order:hover {
+            background: #218838;
+        }
+
+        .summary-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid #ddd;
+            padding: 15px 0;
+        }
+
+        .product-image {
+            width: 110px;
+            height: 110px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: #f8f8f8;
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-info p {
+            margin: 7px 0;
+        }
+
+        .total {
+            font-size: 22px;
+            font-weight: bold;
+            color: green;
+            margin-top: 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        @media (max-width: 700px) {
+            .checkout-container {
+                flex-direction: column;
+            }
+
+            .customer-details,
+            .order-summary {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Checkout</h1>
+
+    <div class="checkout-container">
+
+        <div class="customer-details">
+
+            <h2>Customer Details</h2>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <label>Full Name</label>
+                <input
+                    type="text"
+                    name="customer_name"
+                    placeholder="Enter your full name"
+                    required
+                >
+
+                <label>Email Address</label>
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    required
+                >
+
+                <label>Phone Number</label>
+                <input
+                    type="tel"
+                    name="phone"
+                    placeholder="Enter your phone number"
+                    pattern="[0-9]{10}"
+                    maxlength="10"
+                    required
+                >
+
+                <label>Delivery Address</label>
+                <textarea
+                    name="address"
+                    placeholder="Enter your complete delivery address"
+                    required
+                ></textarea>
+
+                <button type="submit" class="place-order">
+                    Place Order
+                </button>
+
+            </form>
+
+            <a href="{% url 'shop:cart' %}" class="back-link">
+                ← Back to Cart
+            </a>
+
+        </div>
+
+        <div class="order-summary">
+
+            <h2>Order Summary</h2>
+
+            {% for item in cart_items %}
+
+                <div class="summary-item">
+
+                    {% if item.product.image %}
+                        <img
+                            src="{{ item.product.image.url }}"
+                            alt="{{ item.product.name }}"
+                            class="product-image"
+                        >
+                    {% endif %}
+
+                    <div class="product-info">
+
+                        <strong>{{ item.product.name }}</strong>
+
+                        <p>Price: ₹{{ item.product.price }}</p>
+
+                        <p>Quantity: {{ item.quantity }}</p>
+
+                        <p>Subtotal: ₹{{ item.subtotal }}</p>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+            <div class="total">
+                Total: ₹{{ total }}
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

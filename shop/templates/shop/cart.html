@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shopping Cart - My Online Store</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #222;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 1px solid #ddd;
+            padding: 20px 0;
+        }
+
+        .product-image {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            background: #f8f8f8;
+            border-radius: 8px;
+        }
+
+        .product-details {
+            flex: 1;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .quantity-controls input {
+            width: 60px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        button, .checkout-button, .continue-button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .update-button {
+            background: #007bff;
+            color: white;
+        }
+
+        .remove-button {
+            background: #dc3545;
+            color: white;
+            margin-top: 10px;
+        }
+
+        .checkout-button {
+            background: #28a745;
+            color: white;
+            margin-top: 20px;
+        }
+
+        .continue-button {
+            background: #555;
+            color: white;
+            margin-top: 20px;
+        }
+
+        .total {
+            text-align: right;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 600px) {
+            .cart-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>My Shopping Cart 🛒</h1>
+
+    {% if cart_items %}
+
+        {% for item in cart_items %}
+
+            <div class="cart-item">
+
+                {% if item.product.image %}
+                    <img
+                        src="{{ item.product.image.url }}"
+                        class="product-image"
+                        alt="{{ item.product.name }}"
+                    >
+                {% endif %}
+
+                <div class="product-details">
+
+                    <h3>{{ item.product.name }}</h3>
+
+                    <p>Price: ₹{{ item.product.price }}</p>
+
+                    <p>Subtotal: ₹{{ item.subtotal }}</p>
+
+                    <form
+                        method="POST"
+                        action="{% url 'shop:update_cart' item.product.id %}"
+                    >
+                        {% csrf_token %}
+
+                        <div class="quantity-controls">
+
+                            <label>Quantity:</label>
+
+                            <input
+                                type="number"
+                                name="quantity"
+                                value="{{ item.quantity }}"
+                                min="1"
+                                max="{{ item.product.stock }}"
+                                required
+                            >
+
+                            <button
+                                type="submit"
+                                class="update-button"
+                            >
+                                Update
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                    <form
+                        method="POST"
+                        action="{% url 'shop:remove_from_cart' item.product.id %}"
+                    >
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="remove-button"
+                        >
+                            Remove
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+        <div class="total">
+            Total: ₹{{ total }}
+        </div>
+
+        <a
+            href="{% url 'shop:checkout' %}"
+            class="checkout-button"
+        >
+            Proceed to Checkout
+        </a>
+
+    {% else %}
+
+        <h3>Your cart is empty.</h3>
+
+    {% endif %}
+
+    <br>
+
+    <a
+        href="{% url 'shop:product_list' %}"
+        class="continue-button"
+    >
+        Continue Shopping
+    </a>
+
+</div>
+
+</body>
+</html>
